@@ -9,7 +9,7 @@ var app = express();
 
 require('dotenv').load();
 
-var mongoURI = process.env.MONGOLAB_URI || process.env.MONGO_URI;
+var mongoURI = process.env.MONGODB_URI || process.env.MONGO_URI;
 
 mongoose.connect(mongoURI);
 
