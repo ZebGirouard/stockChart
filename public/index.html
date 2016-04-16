@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+
+<html ng-app='nightlifeApp' ng-controller='activityController'>
+
+	<head>
+		<title>What's going on tonight? Nightastic: a nightlife app built with Clementine.js</title>
+		
+		<link href="/public/css/main.css" rel="stylesheet" type="text/css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ng-table/0.8.3/ng-table.min.css">
+	</head>
+
+	<header>
+		<div>
+			<p>Welcome to Nightastic, <span id="display-name">your source for nightlife</span>! See what's going on tonight.</p>
+			<div class="loggedInMenu" ng-show="loggedIn">
+				<a href="/logout">Logout</a>
+			</div>
+		</div>
+		<div class="container login" ng-hide="loggedIn">	
+			<a href="/auth/github">
+				<div class="btn" id="login-btn">
+					<img src="/public/img/github_32px.png" alt="github logo" />
+					<p>LOGIN WITH GITHUB</p>
+				</div>
+			</a>
+		</div>
+	</header>
+
+	<body>
+	
+		<div class="container">
+			<form class="btn-container" ng-submit="getActivities(location)">
+				<input type="text" class="text-box" name="location" ng-model="location" placeholder="Where are you going?" required>
+				<input class="btn btn-add" type="submit" value="GO!">
+			</form>
+			<table ng-table="vm.tableParams" class="table btn-container">
+			    <tr ng-repeat="venue in venues track by $index" class="review">
+			        <td>
+			            <img ng-src="{{venue.image_url}}" alt="Venue Image">
+			        </td>
+			        <td>
+			        	<button ng-show="loggedIn" ng-click="toggleAttendee(venue.id)">{{venue.attendees}} Going</button>
+			        	<h1>{{venue.name}}</h1>
+			        	<p>{{venue.snippet_text}}</p>
+			        </td>
+			    </tr>
+			</table>
+		</div>
+		<script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js'></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/ng-table/0.8.3/ng-table.min.js"></script>
+		<script type="text/javascript" src="controllers/activityController.client.js"></script>
+		<script type="text/javascript" src="common/oauth-signature.js"></script>
+	</body>
+	<footer>
+		<p class="container">Venue information provided by the Yelp API.</p>
+	</footer>
+</html>
