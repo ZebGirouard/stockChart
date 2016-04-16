@@ -1,10 +1,9 @@
 'use strict';
 
-var Users = require('../models/users.js');
-var Venues = require('../models/venues.js');
+var Stocks = require('../models/stocks.js');
 
-function ClickHandler () {
-
+function StockHandler () {
+/*
 	this.getAttendees = function (req, res) {
 		Venues
 			.findOne({ venue_id: req.params.id}, 'attendees')
@@ -53,7 +52,7 @@ function ClickHandler () {
 				}
 			});
 	};
-
+*/
 }
 
-module.exports = ClickHandler;
+module.exports = StockHandler;

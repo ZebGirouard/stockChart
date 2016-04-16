@@ -1,8 +1,8 @@
 'use strict';
 
 (function() {
-    var app = angular.module('nightlifeApp', ['ngTable']);
-    
+    var app = angular.module('stockChartApp', ['ngTable']);
+    /*
         app.factory("MyYelpAPI", function($http) {
           function randomString(length, chars) {
             var result = '';
@@ -32,21 +32,22 @@
             }
           };
         });
-        
-        app.controller('activityController', ['$scope', '$http', 'MyYelpAPI', function ($scope, $http, MyYelpAPI) {
-
+        */
+        app.controller('stockController', ['$scope', '$http', function ($scope, $http) {
+          /*
             //Handle GitHub Auth
             $scope.loggedIn = false;
             var displayName = document.querySelector('#display-name');
             var userUrl = '/api/user/:id';
             var venueUrl = '/api/venue/';
             var attendeeUrl = '/api/attendee/';
-          /*
+
              function updateHtmlElement (data, element, userProperty) {
                 element.innerHTML = data[userProperty];
              }
-            */ 
+            */
              // GET GitHub User Info
+             /*
             $http({
                method: 'GET',
                url: userUrl
@@ -121,5 +122,6 @@
                      console.log(response);
                 });
             };
+            */
         }]);
 })();
