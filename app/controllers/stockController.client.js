@@ -3,7 +3,7 @@
 (function() {
     var app = angular.module('stockChartApp', []);
         app.controller('stockController', ['$scope', '$http', function ($scope, $http) {
-            var socket = io.connect("https://clementine-projects-zebgirouard.c9users.io:8081");
+            var socket = io.connect("https://pure-anchorage-82063.herokuapp.com:8081");
             socket.on("serverResponse", function(data) {
                 if(data.message.indexOf("updated") > -1) {
                     $scope.drawChart();
