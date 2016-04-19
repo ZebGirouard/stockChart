@@ -11,20 +11,13 @@ module.exports = function (app, passport) {
 		.get(function (req, res) {
 			res.sendFile(path + '/public/index.html');
 		});
-/*
-	app.route('/api/user/:id')
-		.get(isLoggedIn, function (req, res) {
-			res.json(req.user.github);
-		});
-	
-	app.route('/api/venue/:id')
-		.get(activityHandler.getAttendees, function (req, res) {
-			res.json(req.user.github);
-		});
 
-	app.route('/api/attendee/:venueId/:userId')
-		.post(activityHandler.toggleAttendee, function (req, res) {
-			res.json(req.user.github);
-		});
-		*/
+	app.route('/api/addStock/:symbol')
+		.post(stockHandler.addStock);
+
+	app.route('/api/removeStock/:symbol')
+		.post(stockHandler.removeStock);
+		
+	app.route('/api/stocks')
+		.get(stockHandler.getStocks);
 };

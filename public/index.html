@@ -6,7 +6,6 @@
 		<title>What's the market doing? stockChart3000: a nightlife app built with Clementine.js</title>
 		
 		<link href="/public/css/main.css" rel="stylesheet" type="text/css">
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ng-table/0.8.3/ng-table.min.css">
 	</head>
 
 	<header>
@@ -16,29 +15,22 @@
 	</header>
 
 	<body>
-	
-		<div class="container">
+		<div id="stockChart"></div>
+		<div class="col-md-12 stockContainer">
+			<div class="col-md-2 stockBlock" ng-repeat="stock in stockObjects">
+				<h3>-{{stock.name}}- <button type="button" class="close" ng-click="removeStock(stock.name)">×</button></h3>
+			</div>
+		</div>
+		<div class="container clearFix">
 			<form class="btn-container" ng-submit="addStock(stockName)">
 				<input type="text" class="text-box" name="stockName" ng-model="stockName" placeholder="NASDAQ" required>
 				<input class="btn btn-add" type="submit" value="Add">
 			</form>
-			<!--
-			<table ng-table="vm.tableParams" class="table btn-container">
-			    <tr ng-repeat="venue in venues track by $index" class="review">
-			        <td>
-			            <img ng-src="{{venue.image_url}}" alt="Venue Image">
-			        </td>
-			        <td>
-			        	<button ng-show="loggedIn" ng-click="toggleAttendee(venue.id)">{{venue.attendees}} Going</button>
-			        	<h1>{{venue.name}}</h1>
-			        	<p>{{venue.snippet_text}}</p>
-			        </td>
-			    </tr>
-			</table>
-			-->
 		</div>
 		<script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js'></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/ng-table/0.8.3/ng-table.min.js"></script>
+		<script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+		<script src="https://code.highcharts.com/stock/highstock.js"></script>
+		<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 		<script type="text/javascript" src="controllers/stockController.client.js"></script>
 	</body>
 	<footer>

@@ -1,9 +1,27 @@
 'use strict';
 
-var express = require('express');
-var routes = require('./app/routes/index.js');
-var mongoose = require('mongoose');
-var session = require('express-session');
+var express = require('express'),
+	routes = require('./app/routes/index.js'),
+	mongoose = require('mongoose'),
+	session = require('express-session'),
+	http = require('http'),
+	sio = require('socket.io');
+	
+// create http server
+var server = http.createServer().listen(8081, process.env.IP),
+
+// create socket server
+io = sio.listen(server);
+
+// set socket.io debugging
+
+io.sockets.on('connection', function (socket) {
+
+  socket.on('clientCall', function (data) {
+  	io.sockets.emit('serverResponse', { message: 'Stocks updated!' });
+  });
+
+});	
 
 var app = express();
 

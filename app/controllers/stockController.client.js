@@ -1,127 +1,122 @@
 'use strict';
 
 (function() {
-    var app = angular.module('stockChartApp', ['ngTable']);
-    /*
-        app.factory("MyYelpAPI", function($http) {
-          function randomString(length, chars) {
-            var result = '';
-            for (var i = length; i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
-            return result;
-          }
-          
-          return {
-            "retrieveYelp": function(location, callback) {
-                var method = 'GET';
-                var url = 'https://api.yelp.com/v2/search';
-                var params = {
-                        callback: 'angular.callbacks._0',
-                        location: location,
-                        oauth_consumer_key: 'LgRfnUX5fUNhNL5a90m3Hg', //Consumer Key
-                        oauth_token: 'hSFDXjWZ--Zfoe1un9ryi2eFS1ZhZTgw', //Token
-                        oauth_signature_method: "HMAC-SHA1",
-                        oauth_timestamp: new Date().getTime(),
-                        oauth_nonce: randomString(32, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'),
-                        category_filter: 'bars'
-                    };
-                var consumerSecret = '1FTuNUPFo_qMHhhwAouFBEorQJ4'; //Consumer Secret
-                var tokenSecret = 'CfbzR1348MtE7cLWLsl2Zly9Gdk'; //Token Secret
-                var signature = oauthSignature.generate(method, url, params, consumerSecret, tokenSecret, { encodeSignature: false});
-                params['oauth_signature'] = signature;
-                $http.jsonp(url, {params: params}).success(callback);
-            }
-          };
-        });
-        */
+    var app = angular.module('stockChartApp', []);
         app.controller('stockController', ['$scope', '$http', function ($scope, $http) {
-          /*
-            //Handle GitHub Auth
-            $scope.loggedIn = false;
-            var displayName = document.querySelector('#display-name');
-            var userUrl = '/api/user/:id';
-            var venueUrl = '/api/venue/';
-            var attendeeUrl = '/api/attendee/';
-
-             function updateHtmlElement (data, element, userProperty) {
-                element.innerHTML = data[userProperty];
-             }
-            */
-             // GET GitHub User Info
-             /*
-            $http({
-               method: 'GET',
-               url: userUrl
-            }).then(function successCallback(response) {
-                 $scope.currentUser = {
-                     displayName: response.data['displayName'],
-                     id: response.data['id'],
-                     username: response.data['username'],
-                 };
-                 displayName.innerHTML = $scope.currentUser['displayName'];
-                 $scope.loggedIn = true;
-               }, function errorCallback(response) {
-                 console.log(response);
+            var socket = io.connect("https://clementine-projects-zebgirouard.c9users.io:8081");
+            socket.on("serverResponse", function(data) {
+                if(data.message.indexOf("updated") > -1) {
+                    $scope.drawChart();
+                }
             });
-               
-            //Get Venues from Yelp
-            if (sessionStorage.venues) {
-                $scope.venues = JSON.parse(sessionStorage.venues);
-            }
-            else {
-                $scope.venues = [];
-            }
-                
-            $scope.getActivities = function(location) {
-                MyYelpAPI.retrieveYelp(location, function(data) {
-                    $scope.venues = data.businesses;
-                    //Get Attendee Info
-                    var j = 0;
-                    for (let i=0; i<$scope.venues.length; i++) {
-                        var venueID = $scope.venues[i].id;
-                        $http({
-                           method: 'GET',
-                           url: venueUrl+venueID
-                        }).then(function successCallback(response) {
-                            var attendeeTotal;
-                            if (response.data) {
-                                attendeeTotal = response.data.attendees.length;                                
-                            }
-                            else {
-                                attendeeTotal = 0;
-                            }
-                             $scope.venues[i].attendees = attendeeTotal;
-                            j++;
-                            if (j === $scope.venues.length) {
-                                sessionStorage.setItem('venues', JSON.stringify($scope.venues));
-                            }
-                           }, function errorCallback(response) {
-                             console.log(response);
-                        });   
+            
+            $scope.drawChart = function () {
+                $scope.stockObjects = [];
+                $http.get('/api/stocks')
+                .then(function(response) {
+                    for (var i = 0; i < response.data.length; i++) {
+                        $scope.stockObjects.push({name: response.data[i].stock_name.toUpperCase()});                        
                     }
-                });
+        
+                    var seriesOptions = [],
+                        seriesCounter = 0;
+                
+                    /**
+                     * Create the chart when all data is loaded
+                     * @returns {undefined}
+                     */
+                    function createChart() {
+                
+                        $('#stockChart').highcharts('StockChart', {
+                
+                            rangeSelector: {
+                                selected: 4
+                            },
+                
+                            yAxis: {
+                                labels: {
+                                    formatter: function () {
+                                        return (this.value > 0 ? ' + ' : '') + this.value + '%';
+                                    }
+                                },
+                                plotLines: [{
+                                    value: 0,
+                                    width: 2,
+                                    color: 'silver'
+                                }]
+                            },
+                
+                            plotOptions: {
+                                series: {
+                                    compare: 'percent'
+                                }
+                            },
+                
+                            tooltip: {
+                                pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.change}%)<br/>',
+                                valueDecimals: 2
+                            },
+                
+                            series: seriesOptions
+                        });
+                    }
+                
+                    $.each($scope.stockObjects, function (i, stock) {
+                
+                        $.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=' + stock.name.toLowerCase() + '-c.json&callback=?',    function (data) {
+                            seriesOptions[i] = {
+                                name: stock.name,
+                                data: data
+                            };
+                
+                            // As we're loading the data asynchronously, we don't know what order it will arrive. So
+                            // we keep a counter and create the chart when all the data is loaded.
+                            seriesCounter += 1;
+                
+                            if (seriesCounter === $scope.stockObjects.length) {
+                                createChart();
+                            }
+                        });
+                    });
+            
+                });    
             };
             
-            $scope.toggleAttendee = function(venueID) {
-                var userID = $scope.currentUser.id;
-                $http({
-                   method: 'POST',
-                   url: attendeeUrl+venueID+"/"+userID
-                }).then(function successCallback(response) {
-    			    var alteredVenues = $scope.venues.map(function(element) {
-    				    if (element.id == venueID) {
-    				        element.attendees = response.data.attendees.length;
-    				        return element;
-    				    }
-    				    else {
-    				        return element;    				    
-    				    }
-    			    });                      
-    				$scope.venues = alteredVenues;
-    				sessionStorage.setItem('venues', JSON.stringify($scope.venues));
-                   }, function errorCallback(response) {
-                     console.log(response);
-                });
+            $scope.drawChart();
+            
+            $scope.addStock = function(stockSymbol) {
+              $http.post('/api/addStock/'+stockSymbol)
+              .then(function(response) {
+    		    if (response.data.indexOf("Failed") > -1) {
+        		    $('form.btn-container').prepend('<div class="error">Incorrect or non-existent stock code.</div>');
+        		    setTimeout(function(){
+                        $('.error').fadeOut("slow");
+                    },3000);    		        
+    		    }
+                else if (response.data.indexOf("already") > -1) {
+        		    $('form.btn-container').prepend('<div class="error">Stock already in chart.</div>');
+        		    setTimeout(function(){
+                        $('.error').fadeOut("slow");
+                    },3000);                      
+                }
+                else {
+                    socket.emit("clientCall", { message : "Stock added!" } );
+                }
+              })
+              .catch(function(err) {
+                console.log(err);
+              });
             };
-            */
+            
+            $scope.removeStock = function(stockSymbol) {
+              $http.post('/api/removeStock/'+stockSymbol)
+              .then(function(response) {
+                socket.emit("clientCall", { message : "Stock removed!" } );
+              })
+              .catch(function(err) {
+                  console.log(err);
+              });
+            };
+            
         }]);
 })();
