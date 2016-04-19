@@ -6,22 +6,6 @@ var express = require('express'),
 	session = require('express-session'),
 	http = require('http'),
 	sio = require('socket.io');
-	
-// create http server
-var server = http.createServer().listen(parseInt(process.env.PORT, 10)+1, process.env.IP),
-
-// create socket server
-io = sio.listen(server);
-
-// set socket.io debugging
-
-io.sockets.on('connection', function (socket) {
-
-  socket.on('clientCall', function (data) {
-  	io.sockets.emit('serverResponse', { message: 'Stocks updated! and ' + process.env.PORT });
-  });
-
-});	
 
 var app = express();
 
@@ -43,7 +27,23 @@ app.use(session({
 
 routes(app);
 
-var port = process.env.PORT || 8080;
-app.listen(port,  function () {
+var port = process.env.PORT || 8080;	
+// create http server
+var server = http.createServer(app),
+
+// create socket server
+io = sio.listen(server);
+
+// set socket.io debugging
+
+io.sockets.on('connection', function (socket) {
+
+  socket.on('clientCall', function (data) {
+  	io.sockets.emit('serverResponse', { message: 'Stocks updated! and ' + process.env.PORT });
+  });
+
+});	
+
+server.listen(port,  function () {
 	console.log('Node.js listening on port ' + port + '...');
 });
