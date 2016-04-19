@@ -6,7 +6,6 @@
             var socket = io.connect($location.origin);
             socket.on("serverResponse", function(data) {
                 if(data.message.indexOf("updated") > -1) {
-                    console.log(data.message);
                     $scope.drawChart();
                 }
             });
