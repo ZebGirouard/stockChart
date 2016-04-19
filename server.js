@@ -8,7 +8,7 @@ var express = require('express'),
 	sio = require('socket.io');
 	
 // create http server
-var server = http.createServer().listen(8081, process.env.IP),
+var server = http.createServer().listen(parseInt(process.env.PORT, 10)+1, process.env.IP),
 
 // create socket server
 io = sio.listen(server);
@@ -18,7 +18,7 @@ io = sio.listen(server);
 io.sockets.on('connection', function (socket) {
 
   socket.on('clientCall', function (data) {
-  	io.sockets.emit('serverResponse', { message: 'Stocks updated!' });
+  	io.sockets.emit('serverResponse', { message: 'Stocks updated! and ' + process.env.PORT });
   });
 
 });	
